@@ -39,3 +39,8 @@ sysinfo.txt
 *.unitypackage
 
 /www/node_modules/
+
+/App/
+/TestApp/
+/UWP/
+*WSATestCertificate.pfx*
