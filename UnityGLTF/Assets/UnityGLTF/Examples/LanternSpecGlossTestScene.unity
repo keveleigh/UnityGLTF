@@ -451,30 +451,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114000010638385648, guid: 5255039e40b37b14fbcc0b72a30fc62e,
-        type: 2}
-      propertyPath: Url
-      value: http://localhost:8080/glTF-Sample-Models/2.0/Lantern/glTF-pbrSpecularGlossiness/Lantern.gltf
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000010638385648, guid: 5255039e40b37b14fbcc0b72a30fc62e,
-        type: 2}
-      propertyPath: GLTFStandard
-      value: 
-      objectReference: {fileID: 4800000, guid: a5732b1b5b2e36d47a3da75e187eba06, type: 3}
-    - target: {fileID: 114000010638385648, guid: 5255039e40b37b14fbcc0b72a30fc62e,
-        type: 2}
-      propertyPath: Multithreaded
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000010638385648, guid: 5255039e40b37b14fbcc0b72a30fc62e,
-        type: 2}
-      propertyPath: GLTFStandardSpecular
-      value: 
-      objectReference: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
-    - target: {fileID: 1000013594771676, guid: 5255039e40b37b14fbcc0b72a30fc62e, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1000013594771676, guid: 5255039e40b37b14fbcc0b72a30fc62e, type: 2}
       propertyPath: m_Name
       value: GLTF
