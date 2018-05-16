@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.IO;
+using GLTF;
+using GLTF.Schema;
 using UnityEngine;
 using UnityGLTF.Loader;
 
 namespace UnityGLTF
 {
+
     /// <summary>
     /// Component to load a GLTF scene with
     /// </summary>
@@ -14,26 +18,14 @@ namespace UnityGLTF
         public bool Multithreaded = true;
         public bool UseStream = false;
 
-        public Stream GLTFStream { get; set; }
-
         [SerializeField]
         private bool loadOnStart = true;
-        public bool LoadOnStart
-        {
-            get { return loadOnStart; }
-            set { loadOnStart = value; }
-        }
 
         public int MaximumLod = 300;
         public GLTFSceneImporter.ColliderType Collider = GLTFSceneImporter.ColliderType.None;
 
         [SerializeField]
         private Shader shaderOverride = null;
-        public Shader ShaderOverride
-        {
-            get { return shaderOverride; }
-            set { shaderOverride = value; }
-        }
 
         IEnumerator Start()
         {
@@ -45,38 +37,38 @@ namespace UnityGLTF
 
         public IEnumerator Load()
         {
+            GLTFSceneImporter sceneImporter = null;
             ILoader loader = null;
 
             if (UseStream)
             {
-                if (GLTFStream == null)
-                {
-                    // Path.Combine treats paths that start with the separator character
-                    // as absolute paths, ignoring the first path passed in. This removes
-                    // that character to properly handle a filename written with it.
-                    GLTFUri = GLTFUri.TrimStart(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
-                    string fullPath = Path.Combine(Application.streamingAssetsPath, GLTFUri);
-
-                    loader = new FileLoader(fullPath);
-                }
-                else
-                {
-                    loader = new StreamLoader(GLTFStream);
-                }
+                // Path.Combine treats paths that start with the separator character
+                // as absolute paths, ignoring the first path passed in. This removes
+                // that character to properly handle a filename written with it.
+                GLTFUri = GLTFUri.TrimStart(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+                string fullPath = Path.Combine(Application.streamingAssetsPath, GLTFUri);
+                string directoryPath = URIHelper.GetDirectoryName(fullPath);
+                loader = new FileLoader(directoryPath);
+                sceneImporter = new GLTFSceneImporter(
+                    Path.GetFileName(GLTFUri),
+                    loader
+                    );
             }
             else
             {
-                loader = new WebRequestLoader(GLTFUri);
+                string directoryPath = URIHelper.GetDirectoryName(GLTFUri);
+                loader = new WebRequestLoader(directoryPath);
+                sceneImporter = new GLTFSceneImporter(
+                    URIHelper.GetFileFromUri(new Uri(GLTFUri)),
+                    loader
+                    );
+
             }
 
-            GLTFSceneImporter sceneImporter = new GLTFSceneImporter(loader)
-            {
-                SceneParent = gameObject.transform,
-                Collider = Collider,
-                MaximumLod = MaximumLod,
-                CustomShaderName = shaderOverride ? shaderOverride.name : null
-            };
-
+            sceneImporter.SceneParent = gameObject.transform;
+            sceneImporter.Collider = Collider;
+            sceneImporter.MaximumLod = MaximumLod;
+            sceneImporter.CustomShaderName = shaderOverride ? shaderOverride.name : null;
             yield return sceneImporter.LoadScene(-1, Multithreaded);
 
             // Override the shaders on all materials if a shader is provided
