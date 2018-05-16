@@ -67,6 +67,7 @@ namespace UnityGLTF
         protected readonly GLTF.Schema.Material DefaultMaterial = new GLTF.Schema.Material();
         protected MaterialCacheData _defaultLoadedMaterial = null;
 
+        protected string _gltfFileName;
         protected GLBStream _gltfStream;
         protected GLTFRoot _gltfRoot;
         protected AssetCache _assetCache;
@@ -75,11 +76,15 @@ namespace UnityGLTF
         private bool _isRunning = false;
 
         /// <summary>
-        /// Creates a GLTFSceneImporter object which will be able to construct a scene.
+        /// Creates a GLTFSceneBuilder object which will be able to construct a scene based off a url
         /// </summary>
-        /// <param name="rootNode">The previously loaded glTF root node.</param>
-        /// <param name="externalDataLoader">The ILoader implementation to load the scene from.</param>
-        /// <param name="glbStream">A stream object containing the glb file to load (optional).</param>
+        /// <param name="gltfFileName">glTF file relative to data loader path</param>
+        /// <param name="parent"></param>
+        public GLTFSceneImporter(string gltfFileName, ILoader externalDataLoader) : this(externalDataLoader)
+        {
+            _gltfFileName = gltfFileName;
+        }
+
         public GLTFSceneImporter(GLTFRoot rootNode, ILoader externalDataLoader, Stream glbStream = null) : this(externalDataLoader)
         {
             _gltfRoot = rootNode;
@@ -89,12 +94,7 @@ namespace UnityGLTF
             }
         }
 
-        /// <summary>
-        /// Creates a GLTFSceneImporter object which will be able to construct a scene from
-        /// the passed in ILoader.
-        /// </summary>
-        /// <param name="externalDataLoader">The ILoader implementation to load the scene from.</param>
-        public GLTFSceneImporter(ILoader externalDataLoader)
+        private GLTFSceneImporter(ILoader externalDataLoader)
         {
             _loader = externalDataLoader;
             _asyncAction = new AsyncAction();
@@ -128,7 +128,7 @@ namespace UnityGLTF
 
                 if (_gltfRoot == null)
                 {
-                    yield return LoadJson();
+                    yield return LoadJson(_gltfFileName);
                 }
                 yield return _LoadScene(sceneIndex, isMultithreaded);
 
@@ -275,9 +275,9 @@ namespace UnityGLTF
             };
         }
 
-        private IEnumerator LoadJson()
+        private IEnumerator LoadJson(string jsonFilePath)
         {
-            yield return _loader.LoadBaseStream();
+            yield return _loader.LoadStream(jsonFilePath);
 
             _gltfStream.Stream = _loader.LoadedStream;
             _gltfStream.StartPosition = 0;

@@ -10,8 +10,6 @@ namespace UnityGLTF.Loader
 {
 	public interface ILoader
 	{
-		IEnumerator LoadBaseStream();
-
 		IEnumerator LoadStream(string relativeFilePath);
 
 		Stream LoadedStream { get; }
