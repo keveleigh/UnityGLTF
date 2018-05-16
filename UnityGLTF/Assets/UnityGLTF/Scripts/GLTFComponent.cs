@@ -47,7 +47,6 @@ namespace UnityGLTF
         public IEnumerator Load()
         {
             GLTFSceneImporter sceneImporter = null;
-            ILoader loader = null;
 
             if (UseStream)
             {
@@ -59,24 +58,25 @@ namespace UnityGLTF
                     GLTFUri = GLTFUri.TrimStart(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
                     string fullPath = Path.Combine(Application.streamingAssetsPath, GLTFUri);
                     string directoryPath = URIHelper.GetDirectoryName(fullPath);
-                    loader = new FileLoader(directoryPath);
                     sceneImporter = new GLTFSceneImporter(
                         Path.GetFileName(GLTFUri),
-                        loader
+                        new FileLoader(directoryPath)
                         );
                 }
                 else
                 {
-                    loader = new StreamLoader(GLTFStream);
+                    sceneImporter = new GLTFSceneImporter(
+                        null,
+                        new StreamLoader(GLTFStream)
+                        );
                 }
             }
             else
             {
                 string directoryPath = URIHelper.GetDirectoryName(GLTFUri);
-                loader = new WebRequestLoader(directoryPath);
                 sceneImporter = new GLTFSceneImporter(
                     URIHelper.GetFileFromUri(new Uri(GLTFUri)),
-                    loader
+                    new WebRequestLoader(directoryPath)
                     );
             }
 
