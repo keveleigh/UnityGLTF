@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
-using GLTF;
 using UnityEngine;
-using System.Text.RegularExpressions;
-using System.Net;
 using UnityEngine.Networking;
 
 #if WINDOWS_UWP
@@ -17,11 +14,23 @@ namespace UnityGLTF.Loader
 	{
 		public Stream LoadedStream { get; private set; }
 
+		private string _rootURIFile;
 		private string _rootURI;
 
-		public WebRequestLoader(string rootURI)
+		public WebRequestLoader(string fullFileURI)
 		{
-			_rootURI = rootURI;
+			_rootURIFile = URIHelper.GetFileFromUri(new Uri(fullFileURI));
+			_rootURI = URIHelper.GetDirectoryName(fullFileURI);
+		}
+
+		public IEnumerator LoadBaseStream()
+		{
+			if (_rootURIFile == null)
+			{
+				throw new InvalidOperationException("_rootURIFile is null.");
+			}
+
+			yield return CreateHTTPRequest(_rootURI, _rootURIFile);
 		}
 
 		public IEnumerator LoadStream(string gltfFilePath)

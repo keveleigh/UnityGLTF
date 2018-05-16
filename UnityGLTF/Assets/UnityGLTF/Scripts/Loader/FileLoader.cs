@@ -1,23 +1,30 @@
-﻿using System.IO;
-using GLTF;
-using UnityEngine;
-using System;
+﻿using System;
 using System.Collections;
-
-#if WINDOWS_UWP
-using System.Threading.Tasks;
-#endif
+using System.IO;
 
 namespace UnityGLTF.Loader
 {
 	public class FileLoader : ILoader
 	{
-		private string _rootDirectoryPath;
 		public Stream LoadedStream { get; private set; }
 
-		public FileLoader(string rootDirectoryPath)
+		private string _rootFilePath;
+		private string _rootDirectoryPath;
+
+		public FileLoader(string fullFilePath)
 		{
-			_rootDirectoryPath = rootDirectoryPath;
+			_rootFilePath = Path.GetFileName(fullFilePath);
+			_rootDirectoryPath = URIHelper.GetDirectoryName(fullFilePath);
+		}
+
+		public IEnumerator LoadBaseStream()
+		{
+			if (_rootFilePath == null)
+			{
+				throw new InvalidOperationException("_rootFilePath is null.");
+			}
+
+			yield return LoadFileStream(_rootDirectoryPath, _rootFilePath);
 		}
 
 		public IEnumerator LoadStream(string gltfFilePath)
