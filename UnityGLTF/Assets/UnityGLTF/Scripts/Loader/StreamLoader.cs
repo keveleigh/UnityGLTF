@@ -13,7 +13,7 @@ namespace UnityGLTF.Loader
             LoadedStream = loadedStream;
         }
 
-        public IEnumerator LoadBaseStream()
+        public IEnumerator LoadStream(string gltfFilePath)
         {
             if (LoadedStream == null)
             {
@@ -21,11 +21,6 @@ namespace UnityGLTF.Loader
             }
 
             yield return null;
-        }
-
-        public IEnumerator LoadStream(string gltfFilePath)
-        {
-            throw new InvalidOperationException("StreamLoader does not load files.");
         }
     }
 }
