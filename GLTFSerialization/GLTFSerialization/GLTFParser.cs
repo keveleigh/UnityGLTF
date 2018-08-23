@@ -1,6 +1,6 @@
+using GLTF.Schema;
 using System;
 using System.IO;
-using GLTF.Schema;
 
 namespace GLTF
 {

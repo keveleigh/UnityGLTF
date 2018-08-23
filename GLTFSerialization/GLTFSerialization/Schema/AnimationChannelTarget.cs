@@ -1,22 +1,26 @@
-using System;
 using GLTF.Extensions;
 using Newtonsoft.Json;
+using System;
+using System.Runtime.Serialization;
 
 namespace GLTF.Schema
 {
 	/// <summary>
 	/// The index of the node and TRS property that an animation channel targets.
 	/// </summary>
+	[DataContract]
 	public class AnimationChannelTarget : GLTFProperty
 	{
 		/// <summary>
 		/// The index of the node to target.
 		/// </summary>
+		[DataMember(Name = "node")]
 		public NodeId Node;
 
 		/// <summary>
 		/// The name of the node's TRS property to modify.
 		/// </summary>
+		[DataMember(Name = "path")]
 		public GLTFAnimationChannelPath Path;
 
 		public static AnimationChannelTarget Deserialize(GLTFRoot root, JsonReader reader)
@@ -34,14 +38,8 @@ namespace GLTF.Schema
 
 				switch (curProp)
 				{
-					case "node":
-						animationChannelTarget.Node = NodeId.Deserialize(root, reader);
-						break;
 					case "path":
 						animationChannelTarget.Path = reader.ReadStringEnum<GLTFAnimationChannelPath>();
-						break;
-					default:
-						animationChannelTarget.DefaultPropertyDeserializer(root, reader);
 						break;
 				}
 			}
@@ -59,21 +57,6 @@ namespace GLTF.Schema
 
 			Node = new NodeId(channelTarget.Node, gltfRoot);
 			Path = channelTarget.Path;
-		}
-
-		public override void Serialize(JsonWriter writer)
-		{
-			writer.WriteStartObject();
-
-			writer.WritePropertyName("node");
-			writer.WriteValue(Node.Id);
-
-			writer.WritePropertyName("path");
-			writer.WriteValue(Path.ToString());
-
-			base.Serialize(writer);
-
-			writer.WriteEndObject();
 		}
 	}
 

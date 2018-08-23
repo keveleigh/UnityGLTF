@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using GLTF.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace GLTF.Schema
 {
+	[DataContract]
 	public class GLTFProperty
 	{
 		private static Dictionary<string, ExtensionFactory> _extensionRegistry = new Dictionary<string, ExtensionFactory>();
@@ -18,7 +20,10 @@ namespace GLTF.Schema
 			_extensionRegistry.Add(extensionFactory.ExtensionName, extensionFactory);
 		}
 
+		[DataMember(Name = "extensions")]
 		public Dictionary<string, IExtension> Extensions;
+
+		// NOT SURE WHAT TO DO HERE
 		public JToken Extras;
 
 		public GLTFProperty()

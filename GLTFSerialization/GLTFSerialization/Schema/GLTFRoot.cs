@@ -1,101 +1,120 @@
+using GLTF.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GLTF.Extensions;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace GLTF.Schema
 {
 	/// <summary>
 	/// The root object for a glTF asset.
 	/// </summary>
+	[DataContract]
 	public class GLTFRoot : GLTFProperty
 	{
 		/// <summary>
 		/// Names of glTF extensions used somewhere in this asset.
 		/// </summary>
+		[DataMember(Name = "extensionsUsed")]
 		public List<string> ExtensionsUsed;
 
 		/// <summary>
 		/// Names of glTF extensions required to properly load this asset.
 		/// </summary>
+		[DataMember(Name = "extensionsRequired")]
 		public List<string> ExtensionsRequired;
 
 		/// <summary>
 		/// An array of accessors. An accessor is a typed view into a bufferView.
 		/// </summary>
+		[DataMember(Name = "accessors")]
 		public List<Accessor> Accessors;
 
 		/// <summary>
 		/// An array of keyframe animations.
 		/// </summary>
+		[DataMember(Name = "animations")]
 		public List<Animation> Animations;
 
 		/// <summary>
 		/// Metadata about the glTF asset.
 		/// </summary>
+		[DataMember(Name = "asset")]
 		public Asset Asset;
 
 		/// <summary>
 		/// An array of buffers. A buffer points to binary geometry, animation, or skins.
 		/// </summary>
+		[DataMember(Name = "buffers")]
 		public List<Buffer> Buffers;
 
 		/// <summary>
 		/// An array of bufferViews.
 		/// A bufferView is a view into a buffer generally representing a subset of the buffer.
 		/// </summary>
+		[DataMember(Name = "bufferViews")]
 		public List<BufferView> BufferViews;
 
 		/// <summary>
 		/// An array of cameras. A camera defines a projection matrix.
 		/// </summary>
+		[DataMember(Name = "cameras")]
 		public List<Camera> Cameras;
 
 		/// <summary>
 		/// An array of images. An image defines data used to create a texture.
 		/// </summary>
+		[DataMember(Name = "images")]
 		public List<Image> Images;
 
 		/// <summary>
 		/// An array of materials. A material defines the appearance of a primitive.
 		/// </summary>
+		[DataMember(Name = "materials")]
 		public List<Material> Materials;
 
 		/// <summary>
 		/// An array of meshes. A mesh is a set of primitives to be rendered.
 		/// </summary>
+		[DataMember(Name = "meshes")]
 		public List<Mesh> Meshes;
 
 		/// <summary>
 		/// An array of nodes.
 		/// </summary>
+		[DataMember(Name = "nodes")]
 		public List<Node> Nodes;
 
 		/// <summary>
 		/// An array of samplers. A sampler contains properties for texture filtering and wrapping modes.
 		/// </summary>
+		[DataMember(Name = "samplers")]
 		public List<Sampler> Samplers;
 
 		/// <summary>
 		/// The index of the default scene.
 		/// </summary>
+		[DataMember(Name = "scene")]
 		public SceneId Scene;
 
 		/// <summary>
 		/// An array of scenes.
 		/// </summary>
+		[DataMember(Name = "scenes")]
 		public List<Scene> Scenes;
 
 		/// <summary>
 		/// An array of skins. A skin is defined by joints and matrices.
 		/// </summary>
+		[DataMember(Name = "skins")]
 		public List<Skin> Skins;
 
 		/// <summary>
 		/// An array of textures.
 		/// </summary>
+		[DataMember(Name = "textures")]
 		public List<Texture> Textures;
 
 		public GLTFRoot()
@@ -261,10 +280,11 @@ namespace GLTF.Schema
 			return null;
 		}
 
-		public static GLTFRoot Deserialize(TextReader textReader)
+		public static GLTFRoot Deserialize(Stream dataStream, DataContractJsonSerializerSettings settings = null)
 		{
-			var jsonReader = new JsonTextReader(textReader);
-			var root = new GLTFRoot();
+			DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(GLTFRoot));
+
+			return serializer.ReadObject(dataStream) as GLTFRoot;
 
 			if (jsonReader.Read() && jsonReader.TokenType != JsonToken.StartObject)
 			{
@@ -277,12 +297,6 @@ namespace GLTF.Schema
 
 				switch (curProp)
 				{
-					case "extensionsUsed":
-						root.ExtensionsUsed = jsonReader.ReadStringList();
-						break;
-					case "extensionsRequired":
-						root.ExtensionsRequired = jsonReader.ReadStringList();
-						break;
 					case "accessors":
 						root.Accessors = jsonReader.ReadList(() => Accessor.Deserialize(root, jsonReader));
 						break;

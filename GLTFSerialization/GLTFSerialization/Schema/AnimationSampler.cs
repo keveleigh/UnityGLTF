@@ -1,5 +1,6 @@
 using GLTF.Extensions;
 using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace GLTF.Schema
 {
@@ -14,6 +15,7 @@ namespace GLTF.Schema
 	/// <summary>
 	/// Combines input and output accessors with an interpolation algorithm to define a keyframe graph (but not its target).
 	/// </summary>
+	[DataContract]
 	public class AnimationSampler : GLTFProperty
 	{
 		/// <summary>
@@ -22,6 +24,7 @@ namespace GLTF.Schema
 		/// seconds with `time[0] >= 0.0`, and strictly increasing values,
 		/// i.e., `time[n + 1] > time[n]`
 		/// </summary>
+		[DataMember(Name = "input")]
 		public AccessorId Input;
 
 		/// <summary>
@@ -31,6 +34,7 @@ namespace GLTF.Schema
 		/// interpolation is `\"STEP\"`, animated value remains constant to the value
 		/// of the first point of the timeframe, until the next timeframe.
 		/// </summary>
+		[DataMember(Name = "interpolation")]
 		public InterpolationType Interpolation;
 
 		/// <summary>
@@ -38,6 +42,7 @@ namespace GLTF.Schema
 		/// accessors must have the same `count`. When sampler is used with TRS target,
 		/// output accessor's componentType must be `FLOAT`.
 		/// </summary>
+		[DataMember(Name = "output")]
 		public AccessorId Output;
 
 		public AnimationSampler()
@@ -63,43 +68,13 @@ namespace GLTF.Schema
 
 				switch (curProp)
 				{
-					case "input":
-						animationSampler.Input = AccessorId.Deserialize(root, reader);
-						break;
 					case "interpolation":
 						animationSampler.Interpolation = reader.ReadStringEnum<InterpolationType>();
-						break;
-					case "output":
-						animationSampler.Output = AccessorId.Deserialize(root, reader);
-						break;
-					default:
-						animationSampler.DefaultPropertyDeserializer(root, reader);
 						break;
 				}
 			}
 
 			return animationSampler;
-		}
-
-		public override void Serialize(JsonWriter writer)
-		{
-			writer.WriteStartObject();
-
-			writer.WritePropertyName("input");
-			writer.WriteValue(Input.Id);
-
-			if (Interpolation != InterpolationType.LINEAR)
-			{
-				writer.WritePropertyName("interpolation");
-				writer.WriteValue(Interpolation.ToString());
-			}
-
-			writer.WritePropertyName("output");
-			writer.WriteValue(Output.Id);
-
-			base.Serialize(writer);
-
-			writer.WriteEndObject();
 		}
 	}
 }
